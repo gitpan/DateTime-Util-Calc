@@ -1,7 +1,9 @@
 Build.PL
+CHANGES
 lib/DateTime/Util/Calc.pm
-Makefile.PL
+LICENSE
 META.yml
+Makefile.PL
 MANIFEST
 t/01-poly.t
 t/02-minmax.t

@@ -29,12 +29,13 @@ BEGIN
         $NoBigFloat = 1;
     }
 }
+use constant RATA_DIE => DateTime->new(year => 1);
 use Math::Round qw(round);
 use Math::Trig qw(deg2rad asin acos tan pi);
 use Params::Validate();
 use POSIX();
 
-sub rata_die { DateTime->new(year => 1) }
+sub rata_die { RATA_DIE->clone }
 
 sub bigfloat
 {
@@ -105,6 +106,9 @@ sub max { $_[0] < $_[1] ? $_[1] : $_[0] }
 sub moment
 {
     my($dt) = Params::Validate::validate_pos(@_, { isa => 'DateTime' });
+
+    $dt = $dt->clone;
+    $dt->set_time_zone('UTC');
     my($rd, $seconds) = $dt->utc_rd_values;
     return $rd + $seconds / (24 * 3600);
 }
@@ -114,6 +118,7 @@ sub dt_from_moment
     my($moment) = Params::Validate::validate_pos(@_,
         { type =>
             Params::Validate::SCALAR()|Params::Validate::OBJECT() });
+
     my $rd_days = POSIX::floor($moment);
     my $time    = ($moment - $rd_days) * 24 * 3600;
     my $dt      = rata_die();
@@ -125,6 +130,7 @@ sub dt_from_moment
     }
     return $dt;
 }
+
     
 sub binary_search
 {
@@ -161,6 +167,19 @@ sub search_next
     return $x;
 }
 
+BEGIN
+{
+    if (eval {require Memoize}) {
+        my $normalizer = sub { sprintf( '%0.06f', bf_downgrade($_[0]) ) };
+
+        Memoize::memoize( \&dt_from_moment, NORMALIZER => $normalizer );
+        Memoize::memoize( \&sin_deg, NORMALIZER => $normalizer );
+        Memoize::memoize( \&cos_deg, NORMALIZER => $normalizer );
+        Memoize::memoize( \&tan_deg, NORMALIZER => $normalizer );
+        Memoize::memoize( \&asin_deg, NORMALIZER => $normalizer );
+        Memoize::memoize( \&acos_deg, NORMALIZER => $normalizer );
+    }
+}
 1;
 
 __END__
