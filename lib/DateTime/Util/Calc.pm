@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.11 2005/01/06 22:07:33 lestrrat Exp $
+# $Id: Calc.pm,v 1.12 2005/01/06 22:37:30 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -16,7 +16,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search

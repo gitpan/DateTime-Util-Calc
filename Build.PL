@@ -1,16 +1,15 @@
 #!perl
-# $Id: Build.PL,v 1.9 2005/01/06 22:07:32 lestrrat Exp $
+# $Id: Build.PL,v 1.10 2005/01/06 22:37:29 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 use strict;
-use CPAN;
 use Module::Build;
 
-my $mod       = CPAN::Shell->expand("Module", "DateTime::Util::Calc");
-my $limit_ver = '0.04';
-if ($mod && $mod->inst_version < $limit_ver) {
+my $mod_installed  = eval { require DateTime::Util::Calc };
+my $limit_ver      = '0.04';
+if ($mod_installed && $DateTime::Util::Calc::VERSION < $limit_ver) {
     my $message = <<EOM;
 
 ================================================================================
@@ -34,78 +33,28 @@ EOM
     }
 }
 
-my %requires = (
-    'DateTime' => 0,
-    'Math::Trig' => 0,
-    'Math::BigInt' => 0,
-    'Math::BigFloat' => 0,
-);
+my $gmp_installed  = eval { require Math::BigInt::GMP };
+my $pari_installed = eval { require Math::BigInt::Pari };
 
-
-my $gmp     = CPAN::Shell->expand("Module", "Math::BigInt::GMP");
-my $pari    = CPAN::Shell->expand("Module", "Math::BigInt::Pari");
-my $do_gmp  = 0;
-my $do_pari = 0;
-
-if (!$gmp->inst_version) {
+if (!$gmp_installed && !$pari_installed) {
     my $message = <<EOM;
 
 ================================================================================
-+  Would you like to install Math::BigInt::GMP?
++  You don't seem to have neither Math::BigInt::GMP and Math::BigInt::Pari
 +
 +  Many astronomical calculations require the arbitrary-precision math
 +  libraries like GMP. Without it you might see occasional overflows
-+  which will result in an incorrect calculation.
++  which will result in an incorrect calculation. It is recommended that
++  you install either one of the module (If both are installed, GMP will
++  be used)
 +
-+  To install this you will be required to have installed GMP from
-+  http://www.swox.com/gmp/ prior to installing this module
++  To install GMP, you will be required to have installed GMP library from
++  http://www.swox.com/gmp/ prior to installing the Perl module
 +
-+  Install Math::BigInt::GMP?
-EOM
-    chomp $message;
-    $do_gmp = Module::Build->y_n($message, "n");
-}
-    
-if ($do_gmp) {
-    print "Adding Math::BigInt::GMP to list of prerequisites...\n";
-    $requires{ 'Math::BigInt::GMP' } = 0;
-}
-
-if (!$pari->inst_version) {
-    my $message = <<EOM;
-
-================================================================================
-+  Would you like to install Math::BigInt::Pari?
++  To install Pari, you will be required to have installed Pari from
++  http://www.parigp-home.de/ prior to installing the Perl module.
 +
-+  Many astronomical calculations require the arbitrary-precision math
-+  libraries like Pari. Without it you might see occasional overflows
-+  which will result in an incorrect calculation.
-+
-+  To install this you will be required to have installed GP/Pari from
-+  http://www.parigp-home.de/ prior to installing this module
-+
-+  Install Math::BigInt::Pari?
-EOM
-    chomp $message;
-    $do_pari = Module::Build->y_n($message, "n");
-}
-
-if ($do_pari) {
-    print "Adding Math::BigInt::Pari to list of prerequisites...\n";
-    $requires{ 'Math::BigInt::Pari' } = 0;
-}
-
-if (!$do_gmp && !$do_pari && !$gmp->inst_version && !$pari->inst_version) {
-    my $message = <<EOM;
-
-******************************** WARNING !!! ***********************************
-+  You have chosen not to install either Math::BigInt::GMP or
-+  Math::BigInt::Pari. It is very likely that calculations will overflow,
-+  not necessarily for this module per say, but for others that rely on
-+  this module, such as DateTime::Event::Lunar.
-+
-+  Really proceed with installation without installing Math::BigInt::GMP
-+  or Math::BigInt::Pari?
++  Proceed with installation without Math::BigInt::GMP or Math::BigInt::Pari?
 EOM
     chomp $message;
     my $proceed = Module::Build->y_n($message, "n");
@@ -115,25 +64,7 @@ EOM
         exit 0;
     }
 }
-
-if ($do_gmp) {
-    print <<EOM;
-
-================================================================================
-+ Installing Math::BigInt::GMP...
-EOM
-    CPAN::Shell->install("Math::BigInt::GMP");
-}
-
-if ($do_pari) {
-    print <<EOM;
-
-================================================================================
-+ Installing Math::BigInt::Pari...
-EOM
-    CPAN::Shell->install("Math::BigInt::Pari");
-}
-
+    
 my $class = Module::Build->subclass(code => q|
     sub ACTION_manifest
     {
@@ -149,7 +80,15 @@ my $build = $class->new(
     module_name => 'DateTime::Util::Calc',
     module_author => 'Daisuke Maki <dmaki@cpan.org>',
     license => 'perl',
-    requires => \%requires,
+    requires => {
+        'DateTime' => 0,
+        'Math::Trig' => 0,
+        'Math::BigInt' => 0,
+        'Math::BigFloat' => 0,
+    },
+    recommends => {
+        'Math::BigInt::GMP' => 0
+    },
     build_requires => {
         'Test::More' => 0
     },

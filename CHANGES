@@ -3,6 +3,9 @@ Changelog
 
 Except where noted, all changes by Daisuke Maki.
 
+0.06 07 Jan 2005
+  - Fix Build.PL craziness trying to install things via CPAN
+
 0.05 07 Jan 2005
   - Removed non-existent functions 'bi_upgrade' 'bf_upgrade'
     and replaced them with bigfloat() and bigint()

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: DateTime-Util-Calc
-version: 0.05
+version: 0.06
 author:
   - Daisuke Maki E<lt>daisuke@cpan.orgE<gt>
 abstract: Calculation Utilities
@@ -10,10 +10,12 @@ requires:
   Math::BigFloat: 0
   Math::BigInt: 0
   Math::Trig: 0
+recommends:
+  Math::BigInt::GMP: 0
 build_requires:
   Test::More: 0
 provides:
   DateTime::Util::Calc:
     file: lib/DateTime/Util/Calc.pm
-    version: 0.05
+    version: 0.06
 generated_by: Module::Build version 0.2607
