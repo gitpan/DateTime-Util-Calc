@@ -1,6 +1,10 @@
 Changelog
 ==========
 
+0.01 12 Jan 2004
+  - House cleaning
+  - Minor tweaks
+
 0.01_04 27 Dec 2003
   - Aah, bad bad. The DateTime object returned from rata_die() was set
     to a floating time zone. Yew. Now rata_die() is always in UTC

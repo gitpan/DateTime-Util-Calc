@@ -98,8 +98,7 @@ sub mod
 sub amod
 {
     my($num, $mod) = Params::Validate::validate_pos(@_, 1, 1);
-    my $rv = mod($num, $mod);
-    return $rv == 0 ? $mod : $rv;
+    return mod($num, $mod) || $mod;
 }
 
 sub min { $_[0] > $_[1] ? $_[1] : $_[0] }
