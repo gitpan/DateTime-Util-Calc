@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL,v 1.10 2005/01/06 22:37:29 lestrrat Exp $
+# $Id: Build.PL,v 1.11 2005/01/07 12:14:18 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -71,7 +71,7 @@ my $class = Module::Build->subclass(code => q|
         my $self = shift;
         $self->SUPER::ACTION_manifest();
         if ($self->create_makefile_pl) {
-            $self->_add_to_manifest('Makefile.PL', 'Added here by Module::Build');
+            $self->_add_to_manifest('MANIFEST', 'Makefile.PL       Added here by Build.PL');
         }
     }
 |);

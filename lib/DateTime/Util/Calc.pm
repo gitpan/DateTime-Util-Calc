@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.13 2005/01/07 04:34:00 lestrrat Exp $
+# $Id: Calc.pm,v 1.15 2005/01/07 12:31:50 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -6,6 +6,7 @@
 package DateTime::Util::Calc;
 use strict;
 use DateTime;
+use Math::BigInt   ('upgrade' => 'Math::BigFloat');
 use Math::BigFloat ('lib' => 'GMP,Pari');
 use Math::Trig ();
 use POSIX();
@@ -16,7 +17,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -109,7 +110,7 @@ sub acos_deg { Math::Trig::rad2deg(Math::Trig::acos(bf_downgrade($_[0]))) }
 
 sub mod
 {
-    my $num = bigfloat(shift);
+    my $num = bigint(shift);
     my $mod = shift;
 
     return $num->bmod($mod);
@@ -253,9 +254,6 @@ DateTime::Util::Calc - Calculation Utilities
   my @coeffs = qw(2 3 -2);
   my $x      = 5;
   my $rv     = polynomial($x, @coeffs);
-
-  # surpress use of Math::BigFloat
-  local $DateTime::Util::Calc::NoBigFloat = 1;
 
 =head1 DESCRIPTION
 

@@ -3,6 +3,10 @@ Changelog
 
 Except where noted, all changes by Daisuke Maki.
 
+0.08 07 Jan 2005
+  - It wasn't a bug. Handle it.
+  - Fix Build.PL for MANIFEST
+
 0.07 07 Jan 2005
   - Optimization for polynomial(0, ...)
   - Fixed something that might be a Math::BigInt bug.

@@ -12,4 +12,5 @@ t/04-bigfloat.t
 t/05-search.t
 t/06-moment.t
 t/07-mod.t
+Makefile.PL       Added here by Build.PL
 SIGNATURE    Added here by Module::Build
