@@ -3,5 +3,11 @@ lib/DateTime/Util/Calc.pm
 Makefile.PL
 META.yml
 MANIFEST
+t/01-poly.t
+t/02-minmax.t
+t/03-trig.t
+t/04-bigfloat.t
+t/05-search.t
+t/06-moment.t
 
 SIGNATURE    Added here by Module::Build

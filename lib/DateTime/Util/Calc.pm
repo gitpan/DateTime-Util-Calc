@@ -3,31 +3,31 @@ use strict;
 use vars qw($VERSION @EXPORT_OK @ISA $NoBigFloat);
 BEGIN
 {
-	$VERSION = '0.01';
-	@ISA = qw(Exporter);
-	@EXPORT_OK = qw(
+    $VERSION = '0.01';
+    @ISA = qw(Exporter);
+    @EXPORT_OK = qw(
         binary_search
-		search_next
-		angle
-		bf_downgrade
-		polynomial
-		sin_deg
-		cos_deg
-		tan_deg
-		asin_deg acos_deg mod amod min
-		max bigfloat moment dt_from_moment rata_die
-	);
+        search_next
+        angle
+        bf_downgrade
+        polynomial
+        sin_deg
+        cos_deg
+        tan_deg
+        asin_deg acos_deg mod amod min
+        max bigfloat moment dt_from_moment rata_die
+    );
 
-	# if for some unknown reason Math::BigFloat is not available,
-	# don't use it
-	if (eval { require Math::BigFloat } && !$@) {
-		# call to lib => GMP will be silently ignored if
-		# GMP is not installed
-		Math::BigFloat->import('lib' => 'GMP');
-		$NoBigFloat = 0;
-	} else {
-		$NoBigFloat = 1;
-	}
+    # if for some unknown reason Math::BigFloat is not available,
+    # don't use it
+    if (eval { require Math::BigFloat } && !$@) {
+        # call to lib => GMP will be silently ignored if
+        # GMP is not installed
+        Math::BigFloat->import('lib' => 'GMP');
+        $NoBigFloat = 0;
+    } else {
+        $NoBigFloat = 1;
+    }
 }
 use Math::Round qw(round);
 use Math::Trig qw(deg2rad asin acos tan pi);
@@ -46,10 +46,10 @@ sub angle
 {
     validate_pos(@_,
         { type => Params::Validate::SCALAR() }, 
-		{ type => Params::Validate::SCALAR() },
-		{ type => Params::Validate::SCALAR() } );
+        { type => Params::Validate::SCALAR() },
+        { type => Params::Validate::SCALAR() } );
 
-	# d         m        s
+    # d         m        s
     $_[0] + ($_[1] + ($_[2] / 60)) / 60;
 }
 
@@ -95,8 +95,8 @@ sub mod
 sub amod
 {
     my($num, $mod) = Params::Validate::validate_pos(@_, 1, 1);
-	my $rv = mod($num, $mod);
-	return $rv == 0 ? $mod : $rv;
+    my $rv = mod($num, $mod);
+    return $rv == 0 ? $mod : $rv;
 }
 
 sub min { $_[0] > $_[1] ? $_[1] : $_[0] }
@@ -113,7 +113,7 @@ sub dt_from_moment
 {
     my($moment) = Params::Validate::validate_pos(@_,
         { type =>
-			Params::Validate::SCALAR()|Params::Validate::OBJECT() });
+            Params::Validate::SCALAR()|Params::Validate::OBJECT() });
     my $rd_days = POSIX::floor($moment);
     my $time    = ($moment - $rd_days) * 24 * 3600;
     my $dt      = rata_die();
@@ -183,7 +183,8 @@ DateTime::Util::Calc - Calculation Utilities
 =head1 DESCRIPTION
 
 This module contains some common calculation utilities that are required
-to perform datetime calculations, specifically from "Calendrical Calculations".
+to perform datetime calculations, specifically from "Calendrical Calculations"
+-- they are NOT meant to be general purpose.
 
 Nothing is exported by default. You must either explicitly export them,
 or use as fully qualified function names.

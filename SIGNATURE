@@ -15,15 +15,21 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 c7afe72941cf9302b061798f9e69564f6645b304 Build.PL
-SHA1 ea75b808612152634fa44bc99568d8464663150a MANIFEST
+SHA1 5e70983645b2e843dd32e45a2ea59c0c94012694 MANIFEST
 SHA1 88fbf75ecafe16beb870e269de72988e6ac6adc1 META.yml
 SHA1 ffbb4ba97cdc2ea00f377be0051bdfbb6d96c91e Makefile.PL
-SHA1 30772a11ce0f6ebb2abd1c4b7c1101da9f14e025 lib/DateTime/Util/Calc.pm
+SHA1 5c2996ae3432c3bd0a46042799f8fe7d9bfa00c2 lib/DateTime/Util/Calc.pm
+SHA1 68219513c3e81f2800fdec662797ef9b8b7463c4 t/01-poly.t
+SHA1 324030cf9672409ae3f0e4215cffe87c0306993a t/02-minmax.t
+SHA1 ea0bc555244e2e0009d2b2d4a79b26bcdfb0e063 t/03-trig.t
+SHA1 a4b1d3087dde3856048a7dd010ab39d3d152c5c7 t/04-bigfloat.t
+SHA1 34d7f503c988bed03a97c244371fa4ea84c0da7d t/05-search.t
+SHA1 826c20db85da84cec9af2c69054eeff55deaaec2 t/06-moment.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.0.4 (GNU/Linux)
+Version: GnuPG v1.0.6 (GNU/Linux)
 Comment: For info see http://www.gnupg.org
 
-iD8DBQE/1V84hB111rlaNnYRAgCUAJ4qcaiofT8gx4OSMT2qmDAoA9ItsACeLU4s
-UllhIh0MMQ8Y0j7Wav0LsfI=
-=8AUx
+iD8DBQE/44s2pIZqybP6lHMRAm8iAKCgvQYmwoohFBO2yIADU4af1FI8aACg9XyJ
+bIbV+QNEkiUgLaZuSyaLs04=
+=8jqe
 -----END PGP SIGNATURE-----
