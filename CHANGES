@@ -3,6 +3,10 @@ Changelog
 
 Except where noted, all changes by Daisuke Maki.
 
+0.07 07 Jan 2005
+  - Optimization for polynomial(0, ...)
+  - Fixed something that might be a Math::BigInt bug.
+
 0.06 07 Jan 2005
   - Fix Build.PL craziness trying to install things via CPAN
 

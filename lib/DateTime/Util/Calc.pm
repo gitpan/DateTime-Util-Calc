@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.12 2005/01/06 22:37:30 lestrrat Exp $
+# $Id: Calc.pm,v 1.13 2005/01/07 04:34:00 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -16,7 +16,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.06';
+    $VERSION = '0.07';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -42,9 +42,8 @@ sub rata_die { RATA_DIE->clone }
 sub bigfloat
 {
     return
-        UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] :
-        $_[0] =~ /^-?\d+$/ ? bigint($_[0]) :
-        Math::BigFloat->new($_[0]);
+        UNIVERSAL::isa($_[0], 'Math::BigFloat') ? $_[0] :
+            Math::BigFloat->new($_[0]);
 }
 
 sub bigint
@@ -78,9 +77,18 @@ sub polynomial
         Carp::croak('polynomial requires at least two arguments: polynomial($x, @coeffients)');
     }
 
-    my $x = bigfloat(shift);
-    my $v = 0;
-    my $ret = shift;
+    # XXX - There seems to be a bug in adding BigInt and BigFloat
+    # Math::BigFloat->bzero must be used
+    my $x   = bigfloat(shift @_);
+    my $v   = Math::BigFloat->bzero();
+    my $ret = bigfloat(shift @_);
+
+    # reuse $v for sake of efficiency. we just want to check if $x
+    # is zero or not
+    if ($x == $v) {
+        return $ret;
+    }
+
     while (@_) {
         $v = $x * ($v + pop @_);
     }
