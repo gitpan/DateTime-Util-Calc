@@ -16,6 +16,7 @@ BEGIN
         tan_deg
         asin_deg acos_deg mod amod min
         max bigfloat moment dt_from_moment rata_die
+        truncate_to_midday
     );
 
     # if for some unknown reason Math::BigFloat is not available,
@@ -29,11 +30,12 @@ BEGIN
         $NoBigFloat = 1;
     }
 }
-use constant RATA_DIE => DateTime->new(year => 1);
+use DateTime;
 use Math::Round qw(round);
 use Math::Trig qw(deg2rad asin acos tan pi);
 use Params::Validate();
 use POSIX();
+use constant RATA_DIE => DateTime->new(year => 1, time_zone => 'UTC');
 
 sub rata_die { RATA_DIE->clone }
 
@@ -103,6 +105,7 @@ sub amod
 sub min { $_[0] > $_[1] ? $_[1] : $_[0] }
 sub max { $_[0] < $_[1] ? $_[1] : $_[0] }
 
+# always return UTC rd moments
 sub moment
 {
     my($dt) = Params::Validate::validate_pos(@_, { isa => 'DateTime' });
@@ -165,6 +168,15 @@ sub search_next
         $x = $next->($x);
     }
     return $x;
+}
+
+sub truncate_to_midday
+{
+    $_[0]->set( hour => 12 );
+    $_[0]->set( minute => 0 );
+    $_[0]->set( second => 0 );
+
+    $_[0];
 }
 
 BEGIN

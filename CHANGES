@@ -1,6 +1,11 @@
 Changelog
 ==========
 
+0.01_04 27 Dec 2003
+  - Aah, bad bad. The DateTime object returned from rata_die() was set
+    to a floating time zone. Yew. Now rata_die() is always in UTC
+  - Introduce truncate_to_midday()
+
 0.01_03 23 Dec 2003
   - Try memoizing some of this stuff...
 
