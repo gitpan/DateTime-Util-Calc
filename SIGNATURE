@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.37.
+signed via the Module::Signature module, version 0.38.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,13 +14,13 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 88fa73a336f8ca682030773747209e82d98eb3f5 Build.PL
-SHA1 4d30c21eefbf2c1f65fa37d767015383e2b064e8 CHANGES
+SHA1 43c93491de6f90fcb5a8f80c3d2c34687f19e169 Build.PL
+SHA1 2d34cd8382cf9035e482e445d9e780ee92748bc0 CHANGES
 SHA1 3933b8775a7af6f0ae9dd661c838554bdc41fa63 LICENSE
 SHA1 546ae97a70734e92925b1763e7d2954836bb2ea1 MANIFEST
-SHA1 88fbf75ecafe16beb870e269de72988e6ac6adc1 META.yml
-SHA1 1849b2e69cd3bf568e221f73cf6e91ebae6489c0 Makefile.PL
-SHA1 8c5d87487992cd5b174900a688786ec95e041ddc lib/DateTime/Util/Calc.pm
+SHA1 a47ba16a0cefe2cb883c3154e0db6f487da7fc65 META.yml
+SHA1 faec519f213f7e603ecd1420d147b35713757738 Makefile.PL
+SHA1 4c93c4f7fe22930e3c90d0d8932641888ecf2431 lib/DateTime/Util/Calc.pm
 SHA1 68219513c3e81f2800fdec662797ef9b8b7463c4 t/01-poly.t
 SHA1 324030cf9672409ae3f0e4215cffe87c0306993a t/02-minmax.t
 SHA1 ea0bc555244e2e0009d2b2d4a79b26bcdfb0e063 t/03-trig.t
@@ -31,7 +31,7 @@ SHA1 826c20db85da84cec9af2c69054eeff55deaaec2 t/06-moment.t
 Version: GnuPG v1.0.6 (GNU/Linux)
 Comment: For info see http://www.gnupg.org
 
-iD8DBQFAA3oxpIZqybP6lHMRAje5AKDKslkoC/J9yf65iKExeUiRpvGmGQCfbbD3
-tmxXRTKQ97n2cX2+pkSrGWE=
-=Sr3N
+iD8DBQFAKQmgpIZqybP6lHMRAujjAJ0fCOtDR7XYrxE+Dm5fhyRGMSlxvgCgkr1m
+Xe2qL/thUNz/ckXvaum9cmA=
+=ygEN
 -----END PGP SIGNATURE-----

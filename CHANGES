@@ -1,6 +1,20 @@
 Changelog
 ==========
 
+0.02 10 Feb 2004
+  - Add prompts to install Math::BigInt::GMP and Math::BigInt::Pari on
+    demand. 
+  - Make underlying Math::BigFloat to fall back to Pari if loading GMP fails
+
+0.01 12 Jan 2004
+  - House cleaning
+  - Minor tweaks
+
+0.01_04 27 Dec 2003
+  - Aah, bad bad. The DateTime object returned from rata_die() was set
+    to a floating time zone. Yew. Now rata_die() is always in UTC
+  - Introduce truncate_to_midday()
+
 0.01 12 Jan 2004
   - House cleaning
   - Minor tweaks

@@ -3,7 +3,7 @@ use strict;
 use vars qw($VERSION @EXPORT_OK @ISA $NoBigFloat);
 BEGIN
 {
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -24,7 +24,7 @@ BEGIN
     if (eval { require Math::BigFloat } && !$@) {
         # call to lib => GMP will be silently ignored if
         # GMP is not installed
-        Math::BigFloat->import('lib' => 'GMP');
+        Math::BigFloat->import('lib' => 'GMP,Pari');
         $NoBigFloat = 0;
     } else {
         $NoBigFloat = 1;
