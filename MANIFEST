@@ -2,7 +2,9 @@ Build.PL
 CHANGES
 lib/DateTime/Util/Calc.pm
 LICENSE
+Makefile.PL
 MANIFEST			This list of files
+META.yml
 t/01-poly.t
 t/02-minmax.t
 t/03-trig.t
@@ -10,5 +12,4 @@ t/04-bigfloat.t
 t/05-search.t
 t/06-moment.t
 t/07-mod.t
-META.yml
 SIGNATURE    Added here by Module::Build

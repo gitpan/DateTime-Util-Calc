@@ -3,6 +3,14 @@ Changelog
 
 Except where noted, all changes by Daisuke Maki.
 
+0.05 07 Jan 2005
+  - Removed non-existent functions 'bi_upgrade' 'bf_upgrade'
+    and replaced them with bigfloat() and bigint()
+  - Fixed dt_from_moment(). 
+  - rt #9478: Module::Build doesn't include Makefile.PL in MANIFEST
+    so manually adding it.
+  - No more memoizing
+
 0.04 06 Jan 2005
   - Add revolution() and rev180() (Ronald Hill)
   - Require use of Math::BigInt / Math::BigFloat

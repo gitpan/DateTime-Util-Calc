@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.8 2005/01/06 13:26:25 lestrrat Exp $
+# $Id: Calc.pm,v 1.11 2005/01/06 22:07:33 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -7,7 +7,6 @@ package DateTime::Util::Calc;
 use strict;
 use DateTime;
 use Math::BigFloat ('lib' => 'GMP,Pari');
-use Math::Round ();
 use Math::Trig ();
 use POSIX();
 
@@ -17,7 +16,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -29,20 +28,28 @@ BEGIN
         cos_deg
         tan_deg
         asin_deg acos_deg mod amod min
-        max bigfloat moment dt_from_moment rata_die
+        max bigfloat bigint moment dt_from_moment rata_die
         truncate_to_midday
         revolution
         rev180
     );
 
-    $DOWNGRADE_ACCURACY = 6;
+    $DOWNGRADE_ACCURACY = 32;
 }
 
 sub rata_die { RATA_DIE->clone }
 
 sub bigfloat
 {
-    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] : Math::BigFloat->new($_[0]);
+    return
+        UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] :
+        $_[0] =~ /^-?\d+$/ ? bigint($_[0]) :
+        Math::BigFloat->new($_[0]);
+}
+
+sub bigint
+{
+    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] : Math::BigInt->new($_[0]);
 }
 
 # Downgrades to float
@@ -94,7 +101,7 @@ sub acos_deg { Math::Trig::rad2deg(Math::Trig::acos(bf_downgrade($_[0]))) }
 
 sub mod
 {
-    my $num = bi_upgrade(shift);
+    my $num = bigfloat(shift);
     my $mod = shift;
 
     return $num->bmod($mod);
@@ -121,15 +128,18 @@ sub moment
 
 sub dt_from_moment
 {
-    my $moment  = bf_upgrade(shift);
-    my $rd_days = $moment->bfloor;
-    my $time    = ($moment - $rd_days) * 24 * 3600;
+    my $moment  = bf_downgrade(shift);
+    my $rd_days = int($moment);
+
+    # Upgrade here to BigFloat to maintain accuracy to the second
+    my $time    = bigfloat($moment - $rd_days) * 24 * 3600;
     my $dt      = rata_die();
 
     if ($rd_days || $time) {
         $dt->add(
             days    => bf_downgrade($rd_days - 1),
-            seconds => round(bf_downgrade($time)));
+            seconds => bi_downgrade($time));
+        $dt->truncate(to => 'second');
     }
     return $dt;
 }
@@ -220,19 +230,6 @@ sub rev180
 }
 
 
-BEGIN
-{
-    if (eval {require Memoize}) {
-        my $normalizer = sub { sprintf( '%0.06f', bf_downgrade($_[0]) ) };
-
-        Memoize::memoize( \&dt_from_moment, NORMALIZER => $normalizer );
-        Memoize::memoize( \&sin_deg,  NORMALIZER => $normalizer );
-        Memoize::memoize( \&cos_deg,  NORMALIZER => $normalizer );
-        Memoize::memoize( \&tan_deg,  NORMALIZER => $normalizer );
-        Memoize::memoize( \&asin_deg, NORMALIZER => $normalizer );
-        Memoize::memoize( \&acos_deg, NORMALIZER => $normalizer );
-    }
-}
 1;
 
 __END__

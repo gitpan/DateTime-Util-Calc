@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: DateTime-Util-Calc
-version: 0.04
+version: 0.05
 author:
   - Daisuke Maki E<lt>daisuke@cpan.orgE<gt>
 abstract: Calculation Utilities
@@ -15,5 +15,5 @@ build_requires:
 provides:
   DateTime::Util::Calc:
     file: lib/DateTime/Util/Calc.pm
-    version: 0.04
+    version: 0.05
 generated_by: Module::Build version 0.2607

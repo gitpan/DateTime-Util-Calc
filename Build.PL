@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL,v 1.6 2005/01/06 13:35:28 lestrrat Exp $
+# $Id: Build.PL,v 1.9 2005/01/06 22:07:32 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -41,18 +41,13 @@ my %requires = (
     'Math::BigFloat' => 0,
 );
 
+
+my $gmp     = CPAN::Shell->expand("Module", "Math::BigInt::GMP");
+my $pari    = CPAN::Shell->expand("Module", "Math::BigInt::Pari");
 my $do_gmp  = 0;
 my $do_pari = 0;
-my $gmp_installed  = do {
-    my $mod = CPAN::Shell->expand("Module", "Math::BigInt::GMP");
-    $mod->inst_version();
-};
-my $pari_installed = do {
-    my $mod = CPAN::Shell->expand("Module", "Math::BigInt::Pari");
-    $mod->inst_version();
-};
 
-if (!$gmp_installed) {
+if (!$gmp->inst_version) {
     my $message = <<EOM;
 
 ================================================================================
@@ -76,7 +71,7 @@ if ($do_gmp) {
     $requires{ 'Math::BigInt::GMP' } = 0;
 }
 
-if (!$pari_installed) {
+if (!$pari->inst_version) {
     my $message = <<EOM;
 
 ================================================================================
@@ -100,7 +95,7 @@ if ($do_pari) {
     $requires{ 'Math::BigInt::Pari' } = 0;
 }
 
-if (!$do_gmp && !$do_pari && !$gmp_installed && !$pari_installed) {
+if (!$do_gmp && !$do_pari && !$gmp->inst_version && !$pari->inst_version) {
     my $message = <<EOM;
 
 ******************************** WARNING !!! ***********************************
@@ -121,7 +116,36 @@ EOM
     }
 }
 
-my $build = Module::Build->new(
+if ($do_gmp) {
+    print <<EOM;
+
+================================================================================
++ Installing Math::BigInt::GMP...
+EOM
+    CPAN::Shell->install("Math::BigInt::GMP");
+}
+
+if ($do_pari) {
+    print <<EOM;
+
+================================================================================
++ Installing Math::BigInt::Pari...
+EOM
+    CPAN::Shell->install("Math::BigInt::Pari");
+}
+
+my $class = Module::Build->subclass(code => q|
+    sub ACTION_manifest
+    {
+        my $self = shift;
+        $self->SUPER::ACTION_manifest();
+        if ($self->create_makefile_pl) {
+            $self->_add_to_manifest('Makefile.PL', 'Added here by Module::Build');
+        }
+    }
+|);
+
+my $build = $class->new(
     module_name => 'DateTime::Util::Calc',
     module_author => 'Daisuke Maki <dmaki@cpan.org>',
     license => 'perl',
