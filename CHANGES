@@ -1,6 +1,16 @@
 Changelog
 ==========
 
+Except where noted, all changes by Daisuke Maki.
+
+0.04 06 Jan 2005
+  - Add revolution() and rev180() (Ronald Hill)
+  - Require use of Math::BigInt / Math::BigFloat
+
+0.03 25 Feb 2004
+  - acos_deg() and asin_deg() were reporting incorrect results.
+    Reported by Ronald Hill.
+
 0.02 10 Feb 2004
   - Add prompts to install Math::BigInt::GMP and Math::BigInt::Pari on
     demand. 

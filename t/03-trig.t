@@ -7,13 +7,14 @@ BEGIN
 	use_ok('DateTime::Util::Calc',
 		'sin_deg', 'cos_deg', 'tan_deg', 'asin_deg', 'acos_deg', );
 	use_ok('Math::Trig',
-		'tan', 'asin', 'acos', 'deg2rad');
+		'tan', 'asin', 'acos', 'deg2rad', 'rad2deg');
 }
 
 my $a = rand(360);
-ok( sin_deg($a) == sin(deg2rad($a)) );
-ok( cos_deg($a) == cos(deg2rad($a)) );
-ok( tan_deg($a) == tan(deg2rad($a)) );
-ok( asin_deg($a) == asin(deg2rad($a)) );
-ok( acos_deg($a) == acos(deg2rad($a)) );
+is( sin_deg($a), sin(deg2rad($a)) );
+is( cos_deg($a), cos(deg2rad($a)) );
+is( tan_deg($a), tan(deg2rad($a)) );
+
+is( asin_deg(sin_deg($a)), rad2deg(asin(sin(deg2rad($a)))) );
+is( acos_deg(cos_deg($a)), rad2deg(acos(cos(deg2rad($a)))) );
 

@@ -1,9 +1,23 @@
+# $Id: Calc.pm,v 1.8 2005/01/06 13:26:25 lestrrat Exp $
+#
+# Daisuke Maki <dmaki@cpan.org>
+# All rights reserved.
+
 package DateTime::Util::Calc;
 use strict;
-use vars qw($VERSION @EXPORT_OK @ISA $NoBigFloat);
+use DateTime;
+use Math::BigFloat ('lib' => 'GMP,Pari');
+use Math::Round ();
+use Math::Trig ();
+use POSIX();
+
+use constant RATA_DIE => DateTime->new(year => 1, time_zone => 'UTC');
+
+use vars qw($VERSION @EXPORT_OK @ISA);
+use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.02';
+    $VERSION = '0.04';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -17,57 +31,44 @@ BEGIN
         asin_deg acos_deg mod amod min
         max bigfloat moment dt_from_moment rata_die
         truncate_to_midday
+        revolution
+        rev180
     );
 
-    # if for some unknown reason Math::BigFloat is not available,
-    # don't use it
-    if (eval { require Math::BigFloat } && !$@) {
-        # call to lib => GMP will be silently ignored if
-        # GMP is not installed
-        Math::BigFloat->import('lib' => 'GMP,Pari');
-        $NoBigFloat = 0;
-    } else {
-        $NoBigFloat = 1;
-    }
+    $DOWNGRADE_ACCURACY = 6;
 }
-use DateTime;
-use Math::Round qw(round);
-use Math::Trig qw(deg2rad asin acos tan pi);
-use Params::Validate();
-use POSIX();
-use constant RATA_DIE => DateTime->new(year => 1, time_zone => 'UTC');
 
 sub rata_die { RATA_DIE->clone }
 
 sub bigfloat
 {
-    $NoBigFloat && return $_[0];
-    return Math::BigFloat->new($_[0]);
+    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] : Math::BigFloat->new($_[0]);
+}
+
+# Downgrades to float
+sub bf_downgrade
+{
+    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? 
+        $_[0]->bround($_[1] || $DOWNGRADE_ACCURACY)->bstr() : $_[0];
+}
+
+sub bi_downgrade
+{
+    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? 
+        $_[0]->as_int()->bstr() : $_[0];
 }
 
 sub angle
 {
-    validate_pos(@_,
-        { type => Params::Validate::SCALAR() }, 
-        { type => Params::Validate::SCALAR() },
-        { type => Params::Validate::SCALAR() } );
-
-    # d         m        s
     $_[0] + ($_[1] + ($_[2] / 60)) / 60;
-}
-
-sub bf_downgrade
-{
-    return UNIVERSAL::isa($_[0], 'Math::BigInt') ?
-        $_[0]->bround(32)->bstr() : $_[0];
 }
 
 # polynomial($x, $a(0) ... $a(n))
 sub polynomial
 {
     if (@_ == 1) {
-        Carp::croak('polynomial requires at least two arguments: ' .
-            'polynomial($x, @coeffients)');
+        require Carp;
+        Carp::croak('polynomial requires at least two arguments: polynomial($x, @coeffients)');
     }
 
     my $x = bigfloat(shift);
@@ -79,25 +80,29 @@ sub polynomial
     return $ret + $v;
 }
 
-sub sin_deg  { sin(deg2rad(bf_downgrade($_[0]))) }
-sub cos_deg  { cos(deg2rad(bf_downgrade($_[0]))) }
-sub tan_deg  { tan(deg2rad(bf_downgrade($_[0]))) }
-sub asin_deg { asin(deg2rad(bf_downgrade($_[0]))) }
-sub acos_deg { acos(deg2rad(bf_downgrade($_[0]))) }
+sub deg2rad
+{
+    my $deg = bi_downgrade($_[0]);
+    return Math::Trig::deg2rad($deg > 360 ? $deg % 360 : $deg);
+}
+
+sub sin_deg  { CORE::sin(deg2rad($_[0])) }
+sub cos_deg  { CORE::cos(deg2rad($_[0])) }
+sub tan_deg  { Math::Trig::tan(deg2rad($_[0])) }
+sub asin_deg { Math::Trig::rad2deg(Math::Trig::asin(bf_downgrade($_[0]))) }
+sub acos_deg { Math::Trig::rad2deg(Math::Trig::acos(bf_downgrade($_[0]))) }
 
 sub mod
 {
-    my($num, $mod) = Params::Validate::validate_pos(@_, 1, 1);
-    if (UNIVERSAL::isa($num, 'Math::BigInt')) {
-        return $num->bmod($mod);
-    }
-    my $floor = POSIX::floor($num);
-    return $floor % $mod + $num - $floor;
+    my $num = bi_upgrade(shift);
+    my $mod = shift;
+
+    return $num->bmod($mod);
 }
 
 sub amod
 {
-    my($num, $mod) = Params::Validate::validate_pos(@_, 1, 1);
+    my($num, $mod) = @_;
     return mod($num, $mod) || $mod;
 }
 
@@ -107,8 +112,7 @@ sub max { $_[0] < $_[1] ? $_[1] : $_[0] }
 # always return UTC rd moments
 sub moment
 {
-    my($dt) = Params::Validate::validate_pos(@_, { isa => 'DateTime' });
-
+    my $dt = shift;
     $dt = $dt->clone;
     $dt->set_time_zone('UTC');
     my($rd, $seconds) = $dt->utc_rd_values;
@@ -117,11 +121,8 @@ sub moment
 
 sub dt_from_moment
 {
-    my($moment) = Params::Validate::validate_pos(@_,
-        { type =>
-            Params::Validate::SCALAR()|Params::Validate::OBJECT() });
-
-    my $rd_days = POSIX::floor($moment);
+    my $moment  = bf_upgrade(shift);
+    my $rd_days = $moment->bfloor;
     my $time    = ($moment - $rd_days) * 24 * 3600;
     my $dt      = rata_die();
 
@@ -149,20 +150,13 @@ sub binary_search
     }
 }
 
+sub __increment_one { $_[0] + 1 }
 sub search_next
 {
-    my %args = Params::Validate::validate(@_, {
-        base  => 1,
-        check => { type => Params::Validate::CODEREF() },
-        next => {
-            type    => Params::Validate::CODEREF(),
-            default => sub { $_[0] + 1 }
-        }
-    });
-
+    my %args = @_;
     my $x     = $args{base};
     my $check = $args{check};
-    my $next  = $args{next};
+    my $next  = $args{next} || \&__increment_one;
     while (! $check->($x) ) {
         $x = $next->($x);
     }
@@ -178,15 +172,63 @@ sub truncate_to_midday
     $_[0];
 }
 
+sub revolution
+{
+    #
+    #
+    # FUNCTIONAL SEQUENCE for revolution
+    #
+    # _GIVEN
+    # any angle
+    #
+    # _THEN
+    #
+    # reduces any angle to within the first revolution 
+    # by subtracting or adding even multiples of 360.0
+    # 
+    #
+    # _RETURN
+    #
+    # the value of the input is >= 0.0 and < 360.0
+    #
+
+    my $x = $_[0];
+    return ( $x - 360.0 * floor( $x * ( 1.0 / 360.0 ) ) );
+}
+
+sub rev180
+{
+    #
+    #
+    # FUNCTIONAL SEQUENCE for rev180
+    #
+    # _GIVEN
+    # 
+    # any angle
+    #
+    # _THEN
+    #
+    # Reduce input to within +180..+180 degrees
+    # 
+    #
+    # _RETURN
+    #
+    # angle that was reduced
+    #
+    my ($x) = @_;
+    return ( $x - 360.0 * floor( $x * ( 1.0 / 360.0 ) + 0.5 ) );
+}
+
+
 BEGIN
 {
     if (eval {require Memoize}) {
         my $normalizer = sub { sprintf( '%0.06f', bf_downgrade($_[0]) ) };
 
         Memoize::memoize( \&dt_from_moment, NORMALIZER => $normalizer );
-        Memoize::memoize( \&sin_deg, NORMALIZER => $normalizer );
-        Memoize::memoize( \&cos_deg, NORMALIZER => $normalizer );
-        Memoize::memoize( \&tan_deg, NORMALIZER => $normalizer );
+        Memoize::memoize( \&sin_deg,  NORMALIZER => $normalizer );
+        Memoize::memoize( \&cos_deg,  NORMALIZER => $normalizer );
+        Memoize::memoize( \&tan_deg,  NORMALIZER => $normalizer );
         Memoize::memoize( \&asin_deg, NORMALIZER => $normalizer );
         Memoize::memoize( \&acos_deg, NORMALIZER => $normalizer );
     }
@@ -334,6 +376,20 @@ for a DateTime object $dt matching a certain condition C<foo()>:
     check => \&foo,
     next  => sub { $_[0] + DateTime::Duration->new(days => 1) }
   );
+
+=head2 revolution($angle_in_degrees)
+
+Reduces any angle to within the first revolution by sbtracting or adding
+even multiples of 360.0.
+
+=head2 rev180($angle_in_degrees)
+
+Reduces input to within +180..+180 degrees
+
+=head1 CAVEATS
+
+For performance reasons, there is absolutely no parameter validation via
+Params::Validate in this module!
 
 =head1 AUTHOR
 

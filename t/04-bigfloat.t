@@ -7,7 +7,7 @@ BEGIN
 	use_ok('DateTime::Util::Calc', 'bigfloat', 'bf_downgrade');
 }
 
-my $x  = rand();
+my $x  = sprintf('%0.6f', rand());
 
 SKIP: {
 	skip("BigFloat not enabled", 5)
@@ -19,12 +19,12 @@ SKIP: {
 	ok( !ref($downgraded) );
 
 	# for some reason "eq" here works, but not "=="
-	ok( ($downgraded + 0) eq $x );
+	ok( ($downgraded + 0) eq $x, "$downgraded == $x" );
 
 	local $DateTime::Util::Calc::NoBigFloat = 1;
 
 	$bf = bigfloat($x);
-	ok( !ref($bf) );
+	ok( ref($bf) );
 	ok( $bf == $x );
 }
 
