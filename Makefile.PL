@@ -2,16 +2,16 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+          'PL_FILES' => {},
+          'INSTALLDIRS' => 'site',
           'NAME' => 'DateTime::Util::Calc',
           'VERSION_FROM' => 'lib/DateTime/Util/Calc.pm',
           'PREREQ_PM' => {
-                           'DateTime' => '0',
-                           'Math::BigFloat' => '0',
-                           'Math::BigInt' => '0',
-                           'Math::Trig' => '0',
-                           'Test::More' => '0'
-                         },
-          'INSTALLDIRS' => 'site',
-          'PL_FILES' => {}
+                           'Test::More' => 0,
+                           'DateTime' => 0,
+                           'Math::BigInt' => '>= 1.77',
+                           'Math::Trig' => 0,
+                           'Math::BigFloat' => 0
+                         }
         )
 ;

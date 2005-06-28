@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL,v 1.11 2005/01/07 12:14:18 lestrrat Exp $
+# $Id: Build.PL,v 1.12 2005/06/28 02:14:08 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -81,9 +81,9 @@ my $build = $class->new(
     module_author => 'Daisuke Maki <dmaki@cpan.org>',
     license => 'perl',
     requires => {
-        'DateTime' => 0,
-        'Math::Trig' => 0,
-        'Math::BigInt' => 0,
+        'DateTime'       => 0,
+        'Math::Trig'     => 0,
+        'Math::BigInt'   => '>= 1.77',
         'Math::BigFloat' => 0,
     },
     recommends => {
@@ -92,7 +92,6 @@ my $build = $class->new(
     build_requires => {
         'Test::More' => 0
     },
-    sign => 1,
     create_makefile_pl => 'traditional'
 );
 

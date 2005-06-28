@@ -1,14 +1,16 @@
 --- #YAML:1.0
 name: DateTime-Util-Calc
-version: 0.08
+version: 0.09
 author:
-  - Daisuke Maki E<lt>daisuke@cpan.orgE<gt>
+  - |-
+    (c) Copyright 2004-2005 Daisuke Maki E<lt>daisuke@cpan.orgE<gt>.
+    All rights reserved.
 abstract: Calculation Utilities
 license: perl
 requires:
   DateTime: 0
   Math::BigFloat: 0
-  Math::BigInt: 0
+  Math::BigInt: '>= 1.77'
   Math::Trig: 0
 recommends:
   Math::BigInt::GMP: 0
@@ -17,5 +19,5 @@ build_requires:
 provides:
   DateTime::Util::Calc:
     file: lib/DateTime/Util/Calc.pm
-    version: 0.08
+    version: 0.09
 generated_by: Module::Build version 0.2607

@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.15 2005/01/07 12:31:50 lestrrat Exp $
+# $Id: Calc.pm,v 1.16 2005/06/28 02:14:08 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -17,7 +17,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.08';
+    $VERSION = '0.09';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -113,7 +113,7 @@ sub mod
     my $num = bigint(shift);
     my $mod = shift;
 
-    return $num->bmod($mod);
+    return $num % $mod;
 }
 
 sub amod
@@ -396,7 +396,8 @@ Params::Validate in this module!
 
 =head1 AUTHOR
 
-Daisuke Maki E<lt>daisuke@cpan.orgE<gt>
+(c) Copyright 2004-2005 Daisuke Maki E<lt>daisuke@cpan.orgE<gt>.
+All rights reserved.
 
 =cut
 

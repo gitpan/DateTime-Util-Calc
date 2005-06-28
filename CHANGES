@@ -1,7 +1,11 @@
-Changelog
-==========
+Changes
+=======
 
-Except where noted, all changes by Daisuke Maki.
+Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
+
+0.09 28 Jun 2005
+  - fix mod(). somehow $bigint->bmod($mod) isn't working, so try using
+    $bigint % $mod instead.
 
 0.08 07 Jan 2005
   - It wasn't a bug. Handle it.
