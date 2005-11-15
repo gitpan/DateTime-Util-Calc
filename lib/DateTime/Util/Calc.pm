@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.16 2005/06/28 02:14:08 lestrrat Exp $
+# $Id: Calc.pm,v 1.17 2005/11/15 23:42:48 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -17,13 +17,14 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.09';
+    $VERSION = '0.10';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
         search_next
         angle
         bf_downgrade
+        bi_downgrade
         polynomial
         sin_deg
         cos_deg
@@ -245,7 +246,7 @@ __END__
 
 =head1 NAME
 
-DateTime::Util::Calc - Calculation Utilities
+DateTime::Util::Calc - DateTime Calculation Utilities
 
 =head1 SYNOPSIS
 
@@ -266,6 +267,12 @@ or use as fully qualified function names.
 
 =head1 FUNCTIONS
 
+=head2 max($a, $b)
+
+=head2 min($a, $b)
+
+max() returns the bigger of $a and $b. min() returns the smaller of $a and $b.
+
 =head2 polynomial($x, @coefs)
 
 Calculates the value of a polynomial equation, based on Horner's Rule.
@@ -276,13 +283,43 @@ is expressed as:
 
    polynomial(5, c, b, a);
 
+=head2 moment($dt)
+
+=head2 dt_from_moment($moment)
+
+moment() converts a DateTime object to moment, which is RD days + the time 
+of day as fraction of the total seconds in a day.
+
+dt_from_moment() converts a moment to DateTime object.
+
+=head2 rata_die()
+
+Returns a new DateTime object that is set to Rata Die, 0001-01-01 00:00:00 UTC
+
+=head2 bigfloat($v)
+
+=head2 bigint($v)
+
+If the value $v is not a Math::BigFloat object, returns the value converted
+to Math::BigFloat. Otherwise returns the value itself.
+
+bigint() does the same for Math::BigInt.
+
 =head2 bf_downgrade($v)
+
+=head2 bi_downgrade($v)
 
 If the value $v is a Math::BigFloat object, returns the "downgraded", 
 regular Perl scalar version of $v. This is sometimes required for functions
 or objects that do not accept Math::BigFloat.
 
 If $v is not Math::BigFloat object, just returns the value itself.
+
+bi_downgrade() does the same for Math::BigInt.
+
+=head2 truncate_to_midday($dt)
+
+Truncates the DateTime object to 12:00 noon.
 
 =head2 sin_deg($degrees)
 
@@ -323,6 +360,20 @@ Example:
   amod(10, 5) = 5
   amod(9, 5)  = 4
   amod(8, 5)  = 3
+
+=head2 binary_search($hi, $lo, $mu, $phi)
+
+This is a special version of binary search, where the terminating condition
+is determined by the result of coderefs $mu and $phi.
+
+$mu is passed the value of $hi and $lo. If it returns true upon execution,
+then the search terminates. 
+
+$phi is passed the next median value. If it returns true upon execution,
+then the search terminates.
+
+If the above two fails, then $hi and $lo are re-computed for the next
+iteration.
 
 =head2 search_next(%opts)
 
@@ -388,6 +439,8 @@ even multiples of 360.0.
 =head2 rev180($angle_in_degrees)
 
 Reduces input to within +180..+180 degrees
+
+=head2 angle($h, $m, $s)
 
 =head1 CAVEATS
 

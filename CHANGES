@@ -3,6 +3,10 @@ Changes
 
 Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
 
+0.10 16 Nov 2005
+  - Add POD tests
+  - Add POD
+
 0.09 28 Jun 2005
   - fix mod(). somehow $bigint->bmod($mod) isn't working, so try using
     $bigint % $mod instead.

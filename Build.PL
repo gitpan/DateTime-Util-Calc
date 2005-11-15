@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL,v 1.12 2005/06/28 02:14:08 lestrrat Exp $
+# $Id: Build.PL,v 1.13 2005/11/15 23:42:48 lestrrat Exp $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -66,14 +66,22 @@ EOM
 }
     
 my $class = Module::Build->subclass(code => q|
-    sub ACTION_manifest
+    sub ACTION_disttest
     {
         my $self = shift;
-        $self->SUPER::ACTION_manifest();
-        if ($self->create_makefile_pl) {
-            $self->_add_to_manifest('MANIFEST', 'Makefile.PL       Added here by Build.PL');
-        }
+        local $ENV{PERL_TESTPOD} = 1;
+        $self->SUPER::ACTION_disttest(@_);
     }
+
+    sub find_test_files
+    {
+        my $self  = shift;
+        my $tests = $self->SUPER::find_test_files(@_);
+
+        return $tests if $ENV{PERL_TESTPOD};
+        return [ grep { $_ !~ /\bpod.*\.t\z/ } @$tests ];
+    }
+
 |);
 
 my $build = $class->new(
@@ -92,7 +100,8 @@ my $build = $class->new(
     build_requires => {
         'Test::More' => 0
     },
-    create_makefile_pl => 'traditional'
+    create_makefile_pl => 'traditional',
+    create_readme      => 1,
 );
 
 $build->create_build_script;

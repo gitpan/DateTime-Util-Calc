@@ -1,0 +1,176 @@
+NAME
+    DateTime::Util::Calc - DateTime Calculation Utilities
+
+SYNOPSIS
+      use DateTime::Util::Calc qw(polynomial);
+
+      my @coeffs = qw(2 3 -2);
+      my $x      = 5;
+      my $rv     = polynomial($x, @coeffs);
+
+DESCRIPTION
+    This module contains some common calculation utilities that are required
+    to perform datetime calculations, specifically from "Calendrical
+    Calculations" -- they are NOT meant to be general purpose.
+
+    Nothing is exported by default. You must either explicitly export them,
+    or use as fully qualified function names.
+
+FUNCTIONS
+  max($a, $b)
+  min($a, $b)
+    max() returns the bigger of $a and $b. min() returns the smaller of $a
+    and $b.
+
+  polynomial($x, @coefs)
+    Calculates the value of a polynomial equation, based on Horner's Rule.
+
+       c + b * x + a * (x ** 2)     x = 5
+
+    is expressed as:
+
+       polynomial(5, c, b, a);
+
+  moment($dt)
+  dt_from_moment($moment)
+    moment() converts a DateTime object to moment, which is RD days + the
+    time of day as fraction of the total seconds in a day.
+
+    dt_from_moment() converts a moment to DateTime object.
+
+  rata_die()
+    Returns a new DateTime object that is set to Rata Die, 0001-01-01
+    00:00:00 UTC
+
+  bigfloat($v)
+  bigint($v)
+    If the value $v is not a Math::BigFloat object, returns the value
+    converted to Math::BigFloat. Otherwise returns the value itself.
+
+    bigint() does the same for Math::BigInt.
+
+  bf_downgrade($v)
+  bi_downgrade($v)
+    If the value $v is a Math::BigFloat object, returns the "downgraded",
+    regular Perl scalar version of $v. This is sometimes required for
+    functions or objects that do not accept Math::BigFloat.
+
+    If $v is not Math::BigFloat object, just returns the value itself.
+
+    bi_downgrade() does the same for Math::BigInt.
+
+  truncate_to_midday($dt)
+    Truncates the DateTime object to 12:00 noon.
+
+  sin_deg($degrees)
+  cos_deg($degrees)
+  tan_deg($degrees)
+  asin_deg($degrees)
+  acos_deg($degrees)
+    Each of these functions calculates their respective values based on
+    degrees, not radians (as Perl's version of sin() and cos() would do).
+
+    Since Math::BigFloat does not have corresponding trigonemetric
+    functions, values passed to these funtions will be automatically
+    downgraded via bf_downgrade()
+
+  mod($v,$mod)
+    Calculates the modulus of $v over $mod. Perl's built-in modulus operator
+    (%) for some reason rounds numbers UP when a fractional number's modulus
+    is taken. Many of the calculations also needed the fractional part of
+    the calculation, so this function takes care of both.
+
+    Example:
+
+      mod(12.234, 5) = 2.234
+
+  amod($v,$mod)
+    This function is almost identical to mod(), but when the regular modulus
+    value is 0, returns $mod instead of 0.
+
+    Example:
+
+      amod(11, 5) = 1
+      amod(10, 5) = 5
+      amod(9, 5)  = 4
+      amod(8, 5)  = 3
+
+  binary_search($hi, $lo, $mu, $phi)
+    This is a special version of binary search, where the terminating
+    condition is determined by the result of coderefs $mu and $phi.
+
+    $mu is passed the value of $hi and $lo. If it returns true upon
+    execution, then the search terminates.
+
+    $phi is passed the next median value. If it returns true upon execution,
+    then the search terminates.
+
+    If the above two fails, then $hi and $lo are re-computed for the next
+    iteration.
+
+  search_next(%opts)
+    Performs a "linear" search until some condition is met. This is a
+    generalized version of the formula defined in [1] p.22. The basic idea
+    is :
+
+      x = base
+      while (! check(x) ) {
+         x = next(x);
+      }
+      return x
+
+    %opts can contain the following parameters:
+
+    base
+        The initial value to use to start the search process. The value can
+        be anything, but you must provide "check" and "next" parameters that
+        are capable of handling the type of thing you specified.
+
+    check (coderef)
+        Code to be executed to determine the end of the search. The function
+        receives the current value of "x", and should return a true value if
+        the condition to end the loop has been reached
+
+    next (coderef, optional)
+        Code to be executed to determine the next value of "x". The function
+        receives the current value of "x", and should return the value to be
+        used for the next iteration.
+
+        If unspecified, it will use a function that blindly adds 1 to
+        whatever x is. (so if you specified a number for "base", it should
+        work -- but if you passed an object like DateTime, it will probably
+        be an error)
+
+    So for example, to iterate through 1 through 9, you could do something
+    like this
+
+      my $x = search_next(
+        base => 1,
+        check => sub { $_[0] == 9 }
+      );
+
+    And $x will be set to 9. For a more interesting example, we could look
+    for a DateTime object $dt matching a certain condition "foo()":
+
+      my $dt = search_next(
+        base  => $base_date,
+        check => \&foo,
+        next  => sub { $_[0] + DateTime::Duration->new(days => 1) }
+      );
+
+  revolution($angle_in_degrees)
+    Reduces any angle to within the first revolution by sbtracting or adding
+    even multiples of 360.0.
+
+  rev180($angle_in_degrees)
+    Reduces input to within +180..+180 degrees
+
+  angle($h, $m, $s)
+CAVEATS
+    For performance reasons, there is absolutely no parameter validation via
+    Params::Validate in this module!
+
+AUTHOR
+    (c) Copyright 2004-2005 Daisuke Maki <daisuke@cpan.org>. All rights
+    reserved.
+
