@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL,v 1.13 2005/11/15 23:42:48 lestrrat Exp $
+# $Id: /mirror/DateTime-Util-Calc/Build.PL 1713 2005-11-15T23:42:48.000000Z lestrrat  $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.

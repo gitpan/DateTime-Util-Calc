@@ -13,5 +13,6 @@ t/04-bigfloat.t
 t/05-search.t
 t/06-moment.t
 t/07-mod.t
+t/08-truncate.t
 t/99-pod-coverage.t
 t/99-pod.t

@@ -1,4 +1,4 @@
-# $Id: Calc.pm,v 1.17 2005/11/15 23:42:48 lestrrat Exp $
+# $Id: /mirror/DateTime-Util-Calc/lib/DateTime/Util/Calc.pm 1713 2005-11-15T23:42:48.000000Z lestrrat  $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -17,7 +17,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.10';
+    $VERSION = '0.11';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         binary_search
@@ -109,29 +109,14 @@ sub tan_deg  { Math::Trig::tan(deg2rad($_[0])) }
 sub asin_deg { Math::Trig::rad2deg(Math::Trig::asin(bf_downgrade($_[0]))) }
 sub acos_deg { Math::Trig::rad2deg(Math::Trig::acos(bf_downgrade($_[0]))) }
 
-sub mod
-{
-    my $num = bigint(shift);
-    my $mod = shift;
+sub mod  { bigint($_[0]) % $_[1] }
+sub amod { mod($_[0], $_[1]) || $_[1]; }
+sub min  { $_[0] > $_[1] ? $_[1] : $_[0] }
+sub max  { $_[0] < $_[1] ? $_[1] : $_[0] }
 
-    return $num % $mod;
-}
-
-sub amod
-{
-    my($num, $mod) = @_;
-    return mod($num, $mod) || $mod;
-}
-
-sub min { $_[0] > $_[1] ? $_[1] : $_[0] }
-sub max { $_[0] < $_[1] ? $_[1] : $_[0] }
-
-# always return UTC rd moments
 sub moment
 {
     my $dt = shift;
-    $dt = $dt->clone;
-    $dt->set_time_zone('UTC');
     my($rd, $seconds) = $dt->utc_rd_values;
     return $rd + $seconds / (24 * 3600);
 }
@@ -185,10 +170,8 @@ sub search_next
 
 sub truncate_to_midday
 {
+    $_[0]->truncate(to => 'hour');
     $_[0]->set( hour => 12 );
-    $_[0]->set( minute => 0 );
-    $_[0]->set( second => 0 );
-
     $_[0];
 }
 

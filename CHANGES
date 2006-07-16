@@ -3,6 +3,12 @@ Changes
 
 Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
 
+0.11 16 Jul 2006
+  - Don't clone and set time zone when calculating moment. 
+  - Don't call set() three times in truncate_to_midday.
+  - Beef up moment tests
+  - Add tests
+
 0.10 16 Nov 2005
   - Add POD tests
   - Add POD

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 BEGIN
 {
@@ -9,23 +9,17 @@ BEGIN
 
 my $x  = sprintf('%0.6f', rand());
 
-SKIP: {
-	skip("BigFloat not enabled", 5)
-		if $DateTime::Util::Calc::NoBigFloat;
-	my $bf = bigfloat($x);
-	ok( UNIVERSAL::isa($bf, 'Math::BigFloat') );
+my $bf = bigfloat($x);
+ok( UNIVERSAL::isa($bf, 'Math::BigFloat') );
 
-	my $downgraded = bf_downgrade($bf);
-	ok( !ref($downgraded) );
+my $downgraded = bf_downgrade($bf);
+ok( !ref($downgraded) );
 
-	# for some reason "eq" here works, but not "=="
-	ok( ($downgraded + 0) eq $x, "$downgraded == $x" );
+# for some reason "eq" here works, but not "=="
+$downgraded = sprintf('%0.6f', $downgraded);
+ok( ($downgraded + 0) eq $x, "$downgraded == $x" );
 
-	local $DateTime::Util::Calc::NoBigFloat = 1;
-
-	$bf = bigfloat($x);
-	ok( ref($bf) );
-	ok( $bf == $x );
-}
+$bf = bigfloat($x);
+ok( ref($bf) );
 
 ok( bf_downgrade($x) == $x );
