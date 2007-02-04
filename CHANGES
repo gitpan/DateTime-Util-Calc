@@ -12,6 +12,7 @@ Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
       manually downgrade by doing ->as_number()->bstr()
   - Move to Module::Install.
   - Add Math::BigInt::FastCalc as an option to install as a backend
+  - Fix mod(). Apparently Math::BigInt does (almost) what we want to do.
 
 0.11 16 Jul 2006
   - Don't clone and set time zone when calculating moment. 

@@ -1,4 +1,4 @@
-# $Id: Calc.pm 3604 2007-02-04 10:50:23Z lestrrat $
+# $Id: Calc.pm 3606 2007-02-04 13:34:09Z lestrrat $
 #
 # Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
@@ -71,7 +71,7 @@ sub bi_downgrade
 
 sub angle
 {
-    $_[0] + ($_[1] + ($_[2] / 60)) / 60;
+    Math::BigFloat->new($_[0]) + (Math::BigFloat->new($_[1]) + (Math::BigFloat->new($_[2]) / 60)) / 60;
 }
 
 # polynomial($x, $a(0) ... $a(n))
@@ -126,10 +126,9 @@ sub mod
     my $fraction = 0;
     my $modulus  = 0;
     if (ref($_[0])) {
-        $fraction = $_[0] - $_[0]->as_int;
-        $modulus  = $_[0]->bmod($_[1]);
+        $modulus  = $_[0]->babs->bmod($_[1]);
     } else {
-        $fraction = $_[0] - int($_[0]);
+        $fraction = abs(abs($_[0]) - abs(int($_[0])));
         $modulus  = int($_[0]) % $_[1];
     }
     return $modulus + $fraction;
@@ -171,6 +170,10 @@ sub dt_from_moment
 sub binary_search
 {
     my ($lo, $hi, $mu, $phi) = @_;
+
+    $lo = Math::BigFloat->new($lo);
+    $hi = Math::BigFhiat->new($hi);
+
     while (1) {
         my $x = ($lo + $hi) / 2;
         if ($mu->($lo, $hi)) {
