@@ -1,10 +1,12 @@
-# $Id: /mirror/DateTime-Util-Calc/lib/DateTime/Util/Calc.pm 1713 2005-11-15T23:42:48.000000Z lestrrat  $
+# $Id: Calc.pm 3604 2007-02-04 10:50:23Z lestrrat $
 #
-# Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
 
 package DateTime::Util::Calc;
 use strict;
+use warnings;
+use Carp qw(carp);
 use DateTime;
 use Math::BigInt   ('upgrade' => 'Math::BigFloat');
 use Math::BigFloat ('lib' => 'GMP,Pari');
@@ -17,14 +19,14 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.11';
+    $VERSION = '0.12';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
+        bf_downgrade
+        bi_downgrade
         binary_search
         search_next
         angle
-        bf_downgrade
-        bi_downgrade
         polynomial
         sin_deg
         cos_deg
@@ -53,18 +55,19 @@ sub bigint
     return UNIVERSAL::isa($_[0], 'Math::BigInt') ? $_[0] : Math::BigInt->new($_[0]);
 }
 
-# Downgrades to float
+my $warn_bf_downgrade = 0;
+my $warn_bi_downgrade = 0;
 sub bf_downgrade
 {
-    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? 
-        $_[0]->bround($_[1] || $DOWNGRADE_ACCURACY)->bstr() : $_[0];
+    $warn_bf_downgrade++ or carp "DateTime::Util::Calc::bf_downgrade has been deprecated, and will be removed in future versions.";
+    return $_[0];
 }
 
 sub bi_downgrade
 {
-    return UNIVERSAL::isa($_[0], 'Math::BigInt') ? 
-        $_[0]->as_int()->bstr() : $_[0];
-}
+    $warn_bi_downgrade++ or carp "DateTime::Util::Calc::bi_downgrade has been deprecated, and will be removed in future versions.";
+    return $_[0];
+}   
 
 sub angle
 {
@@ -81,9 +84,9 @@ sub polynomial
 
     # XXX - There seems to be a bug in adding BigInt and BigFloat
     # Math::BigFloat->bzero must be used
-    my $x   = bigfloat(shift @_);
+    my $x   = Math::BigFloat->new(shift @_);
     my $v   = Math::BigFloat->bzero();
-    my $ret = bigfloat(shift @_);
+    my $ret = Math::BigFloat->new(shift @_);
 
     # reuse $v for sake of efficiency. we just want to check if $x
     # is zero or not
@@ -99,17 +102,39 @@ sub polynomial
 
 sub deg2rad
 {
-    my $deg = bi_downgrade($_[0]);
+    my $deg = ref($_[0]) ? $_[0]->bstr() : $_[0];
     return Math::Trig::deg2rad($deg > 360 ? $deg % 360 : $deg);
 }
 
 sub sin_deg  { CORE::sin(deg2rad($_[0])) }
 sub cos_deg  { CORE::cos(deg2rad($_[0])) }
 sub tan_deg  { Math::Trig::tan(deg2rad($_[0])) }
-sub asin_deg { Math::Trig::rad2deg(Math::Trig::asin(bf_downgrade($_[0]))) }
-sub acos_deg { Math::Trig::rad2deg(Math::Trig::acos(bf_downgrade($_[0]))) }
+sub asin_deg
+{
+    my $v = ref($_[0]) ? $_[0]->bstr() : $_[0];
+    return Math::Trig::rad2deg(Math::Trig::asin($v));
+}
 
-sub mod  { bigint($_[0]) % $_[1] }
+sub acos_deg
+{
+    my $v = ref($_[0]) ? $_[0]->bstr() : $_[0];
+    Math::Trig::rad2deg(Math::Trig::acos($v));
+}
+
+sub mod
+{
+    my $fraction = 0;
+    my $modulus  = 0;
+    if (ref($_[0])) {
+        $fraction = $_[0] - $_[0]->as_int;
+        $modulus  = $_[0]->bmod($_[1]);
+    } else {
+        $fraction = $_[0] - int($_[0]);
+        $modulus  = int($_[0]) % $_[1];
+    }
+    return $modulus + $fraction;
+}
+
 sub amod { mod($_[0], $_[1]) || $_[1]; }
 sub min  { $_[0] > $_[1] ? $_[1] : $_[0] }
 sub max  { $_[0] < $_[1] ? $_[1] : $_[0] }
@@ -123,17 +148,20 @@ sub moment
 
 sub dt_from_moment
 {
-    my $moment  = bf_downgrade(shift);
-    my $rd_days = int($moment);
+    my $moment  = Math::BigFloat->new(shift);
+
+    # Truncate the moment down to an int
+    my $rd_days = $moment->as_int();
 
     # Upgrade here to BigFloat to maintain accuracy to the second
-    my $time    = bigfloat($moment - $rd_days) * 24 * 3600;
+    my $time    = ($moment - $rd_days) * 24 * 3600;
     my $dt      = rata_die();
 
     if ($rd_days || $time) {
         $dt->add(
-            days    => bf_downgrade($rd_days - 1),
-            seconds => bi_downgrade($time));
+            days    => ($rd_days - 1)->bstr(),
+            seconds => $time->as_int()->bstr(),
+        );
         $dt->truncate(to => 'second');
     }
     return $dt;
@@ -292,13 +320,7 @@ bigint() does the same for Math::BigInt.
 
 =head2 bi_downgrade($v)
 
-If the value $v is a Math::BigFloat object, returns the "downgraded", 
-regular Perl scalar version of $v. This is sometimes required for functions
-or objects that do not accept Math::BigFloat.
-
-If $v is not Math::BigFloat object, just returns the value itself.
-
-bi_downgrade() does the same for Math::BigInt.
+These have been deprecated.
 
 =head2 truncate_to_midday($dt)
 
@@ -316,10 +338,6 @@ Truncates the DateTime object to 12:00 noon.
 
 Each of these functions calculates their respective values based on degrees,
 not radians (as Perl's version of sin() and cos() would do).
-
-Since Math::BigFloat does not have corresponding trigonemetric functions,
-values passed to these funtions will be automatically downgraded via
-bf_downgrade()
 
 =head2 mod($v,$mod)
 
@@ -425,14 +443,9 @@ Reduces input to within +180..+180 degrees
 
 =head2 angle($h, $m, $s)
 
-=head1 CAVEATS
-
-For performance reasons, there is absolutely no parameter validation via
-Params::Validate in this module!
-
 =head1 AUTHOR
 
-(c) Copyright 2004-2005 Daisuke Maki E<lt>daisuke@cpan.orgE<gt>.
+Copyright (c) 2004-2007 Daisuke Maki E<lt>daisuke@endeworks.jpE<gt>
 All rights reserved.
 
 =cut

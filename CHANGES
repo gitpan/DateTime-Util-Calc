@@ -3,6 +3,16 @@ Changes
 
 Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
 
+0.12 
+  - Andreas Koenig and Tels have been kind enough to warn me of some
+    problems with this family of modules. Some fundamental changes:
+    - Use of '*_downgrade' is no longer an option. Everything is
+      Math::BigInt or Math::BigFloat, otherwise things will get
+      way too messy. In case we need real ints or whatever, we'll
+      manually downgrade by doing ->as_number()->bstr()
+  - Move to Module::Install.
+  - Add Math::BigInt::FastCalc as an option to install as a backend
+
 0.11 16 Jul 2006
   - Don't clone and set time zone when calculating moment. 
   - Don't call set() three times in truncate_to_midday.

@@ -1,32 +1,23 @@
----
-name: DateTime-Util-Calc
-version: !!perl/hash:Module::Build::Version
-  original: 0.11
-  version:
-    - 0
-    - 110
-author:
-  - |-
-    (c) Copyright 2004-2005 Daisuke Maki E<lt>daisuke@cpan.orgE<gt>.
-    All rights reserved.
 abstract: DateTime Calculation Utilities
+author: Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
+name: DateTime-Util-Calc
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Math::BigInt::FastCalc: 0
+  Math::BigInt::GMP: 0
+  Math::BigInt::Pari: 0
+requires: 
   DateTime: 0
   Math::BigFloat: 0
-  Math::BigInt: '>= 1.77'
+  Math::BigInt: 0
   Math::Trig: 0
-build_requires:
-  Test::More: 0
-recommends:
-  Math::BigInt::GMP: 0
-provides:
-  DateTime::Util::Calc:
-    file: lib/DateTime/Util/Calc.pm
-    version: 0.11
-generated_by: Module::Build version 0.2803
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  perl: 5.6.1
+version: 0.12
