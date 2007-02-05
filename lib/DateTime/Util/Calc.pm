@@ -1,4 +1,4 @@
-# $Id: Calc.pm 3606 2007-02-04 13:34:09Z lestrrat $
+# $Id: Calc.pm 3607 2007-02-05 04:20:10Z lestrrat $
 #
 # Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
@@ -123,15 +123,19 @@ sub acos_deg
 
 sub mod
 {
-    my $fraction = 0;
-    my $modulus  = 0;
-    if (ref($_[0])) {
-        $modulus  = $_[0]->babs->bmod($_[1]);
+    my ($x, $y) = @_;
+
+    # x mod y = x - y * (floor(x/y));
+
+    if (ref($x) || ref($y)) {
+        # Make sure both are M::BF
+        $x = Math::BigFloat->new($x) if ! ref ($x);
+        $y = Math::BigFloat->new($y) if ! ref ($y);
+
+        return $x - $y * ( ($x / $y)->bfloor );
     } else {
-        $fraction = abs(abs($_[0]) - abs(int($_[0])));
-        $modulus  = int($_[0]) % $_[1];
+        return $x - $y * ( POSIX::floor($x / $y) );
     }
-    return $modulus + $fraction;
 }
 
 sub amod { mod($_[0], $_[1]) || $_[1]; }
@@ -227,7 +231,7 @@ sub revolution
     #
 
     my $x = $_[0];
-    return ( $x - 360.0 * floor( $x * ( 1.0 / 360.0 ) ) );
+    return ( $x - 360.0 * POSIX::floor( $x * ( 1.0 / 360.0 ) ) );
 }
 
 sub rev180
@@ -250,7 +254,7 @@ sub rev180
     # angle that was reduced
     #
     my ($x) = @_;
-    return ( $x - 360.0 * floor( $x * ( 1.0 / 360.0 ) + 0.5 ) );
+    return ( $x - 360.0 * POSIX::floor( $x * ( 1.0 / 360.0 ) + 0.5 ) );
 }
 
 
