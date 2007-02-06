@@ -3,6 +3,9 @@ Changes
 
 Unless otherwise noted, all changes by Daisuke Maki <dmaki@cpan.org>.
 
+0.13
+  - Fix typo in binary_search()
+
 0.12 
   - Andreas Koenig and Tels have been kind enough to warn me of some
     problems with this family of modules. Some fundamental changes:

@@ -1,4 +1,4 @@
-# $Id: Calc.pm 3607 2007-02-05 04:20:10Z lestrrat $
+# $Id: Calc.pm 3611 2007-02-06 00:24:39Z lestrrat $
 #
 # Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
@@ -19,7 +19,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.12';
+    $VERSION = '0.13';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         bf_downgrade
@@ -176,7 +176,7 @@ sub binary_search
     my ($lo, $hi, $mu, $phi) = @_;
 
     $lo = Math::BigFloat->new($lo);
-    $hi = Math::BigFhiat->new($hi);
+    $hi = Math::BigFloat->new($hi);
 
     while (1) {
         my $x = ($lo + $hi) / 2;
