@@ -22,7 +22,7 @@ for (1..5) {
 
         # For our purposes, truncate the moment to 6 fractional digits
         my $moment = sprintf("%0.6f", moment($dt));
-    
+
         ok($moment, "Moment from DT: $dt -> $moment");
 
         my $dt_from_moment = dt_from_moment($moment);
@@ -31,7 +31,7 @@ for (1..5) {
         # XXX - as of 0.05, I have a discrepancy of 1 second
         # for now I'll ignore it
         my $diff = abs($dt->epoch - $dt_from_moment->epoch);
-        ok($diff <= 1, "DT diff -> $diff");
+        ok($diff <= 1, "DT diff -> $diff, expected diff <= 1");
     }
 }
 

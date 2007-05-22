@@ -1,4 +1,4 @@
-# $Id: Calc.pm 3611 2007-02-06 00:24:39Z lestrrat $
+# $Id: /local/datetime/modules/DateTime-Util-Calc/trunk/lib/DateTime/Util/Calc.pm 11000 2007-02-06T00:24:39.239122Z lestrrat  $
 #
 # Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
@@ -8,8 +8,8 @@ use strict;
 use warnings;
 use Carp qw(carp);
 use DateTime;
-use Math::BigInt   ('upgrade' => 'Math::BigFloat');
-use Math::BigFloat ('lib' => 'GMP,Pari');
+use Math::BigInt   ('lib' => 'GMP,Pari,FastCalc');
+use Math::BigFloat ('lib' => 'GMP,Pari,FastCalc');
 use Math::Trig ();
 use POSIX();
 
@@ -19,7 +19,7 @@ use vars qw($VERSION @EXPORT_OK @ISA);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.13';
+    $VERSION = '0.13001';
     @ISA = qw(Exporter);
     @EXPORT_OK = qw(
         bf_downgrade
@@ -151,7 +151,7 @@ sub moment
 
 sub dt_from_moment
 {
-    my $moment  = Math::BigFloat->new(shift);
+    my $moment  = Math::BigFloat->new('' . shift);
 
     # Truncate the moment down to an int
     my $rd_days = $moment->as_int();
@@ -453,7 +453,6 @@ Reduces input to within +180..+180 degrees
 =head1 AUTHOR
 
 Copyright (c) 2004-2007 Daisuke Maki E<lt>daisuke@endeworks.jpE<gt>
-All rights reserved.
 
 =cut
 
