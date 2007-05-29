@@ -1,12 +1,12 @@
-# $Id: /local/datetime/modules/DateTime-Util-Calc/trunk/lib/DateTime/Util/Calc.pm 11000 2007-02-06T00:24:39.239122Z lestrrat  $
+# $Id: /local/datetime/modules/DateTime-Util-Calc/trunk/lib/DateTime/Util/Calc.pm 11779 2007-05-29T22:12:48.788920Z daisuke  $
 #
 # Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>
-# All rights reserved.
 
 package DateTime::Util::Calc;
 use strict;
 use warnings;
 use Carp qw(carp);
+use Exporter;
 use DateTime;
 use Math::BigInt   ('lib' => 'GMP,Pari,FastCalc');
 use Math::BigFloat ('lib' => 'GMP,Pari,FastCalc');
@@ -15,12 +15,12 @@ use POSIX();
 
 use constant RATA_DIE => DateTime->new(year => 1, time_zone => 'UTC');
 
-use vars qw($VERSION @EXPORT_OK @ISA);
+use vars qw($VERSION @EXPORT_OK);
 use vars qw($DOWNGRADE_ACCURACY);
 BEGIN
 {
-    $VERSION = '0.13001';
-    @ISA = qw(Exporter);
+    *import = \&Exporter::import;
+    $VERSION = '0.13002';
     @EXPORT_OK = qw(
         bf_downgrade
         bi_downgrade
@@ -438,6 +438,11 @@ for a DateTime object $dt matching a certain condition C<foo()>:
     check => \&foo,
     next  => sub { $_[0] + DateTime::Duration->new(days => 1) }
   );
+
+=head2 deg2rad
+
+Converts degrees to radians using Math::Trig, but works for Math::BigInt
+objects as well.
 
 =head2 revolution($angle_in_degrees)
 

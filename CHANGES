@@ -3,8 +3,13 @@ Changes
 
 Unless otherwise noted, all changes by Daisuke Maki.
 
+0.13002 Wed 30 May 2007
+  - Don't inherit from Exporter
+  - Update POD tests
+
 0.13001 Tue 22 May 2007
   - Actually append FastCalc in the libs for Math::BigInt
+  - Remove execution bit from Makefile.PL
 
 0.13
   - Fix typo in binary_search()
